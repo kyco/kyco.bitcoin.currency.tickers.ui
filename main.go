@@ -204,7 +204,7 @@ func get_last_exchange_rates(hours string) []ExchangeData {
 
 	if err != nil {
 		log.Error(err.Error())
-		return
+		return nil
 	}
 
 	// Loop through records
