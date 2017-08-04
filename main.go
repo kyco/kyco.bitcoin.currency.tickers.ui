@@ -210,7 +210,7 @@ func get_last_exchange_rates(hours string) []ExchangeData {
 	// Loop through records
 	for result.Next() {
 		// Scan records into a struct
-		tmpStruct := &ExchangeData{}
+		tmpStruct := ExchangeData{}
 		result.Scan(&tmpStruct.Exchange, &tmpStruct.Ask, &tmpStruct.Bid, &tmpStruct.Price, &tmpStruct.Volume,
 			&tmpStruct.Date, &tmpStruct.CurrencyCode)
 
