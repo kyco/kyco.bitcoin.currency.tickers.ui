@@ -72,21 +72,22 @@ func bitcoin_prices() {
 		day := get_last_exchange_rates("24")
 
 		begin := 3
+
 		// Underline
 		underline := strings.Repeat("-", 99)
 
 		// By moving cursor to top-left position we ensure that console output
 		// will be overwritten each time, instead of adding new.
-		tm.MoveCursor(begin, 40)
+		tm.MoveCursor(begin, 20)
 
 		tm.Println("Current Time:", time.Now().Format(time.RFC1123))
 
-		tm.MoveCursor(begin+3, 60)
+		tm.MoveCursor(begin+3, 40)
 		tm.Println(tm.Bold("1 Hour"))
-		tm.MoveCursorForward(10)
+		tm.MoveCursorForward(5)
 		tm.Println(underline)
 
-		tm.MoveCursor(begin+5, 11)
+		tm.MoveCursor(begin+5, 6)
 		tm.Printf(tm.Bold("Exchange"))
 		tm.MoveCursorForward(10)
 		tm.Printf(tm.Bold("Average"))
@@ -107,7 +108,7 @@ func bitcoin_prices() {
 
 			tm.Println()
 
-			tm.MoveCursorForward(10)
+			tm.MoveCursorForward(5)
 			tm.Printf(hour[i].Exchange)
 			// tm.MoveCursorDown(1)
 			tm.MoveCursorForward((18 - len(hour[i].Exchange)))
@@ -132,13 +133,13 @@ func bitcoin_prices() {
 		// Reset row
 		tm.MoveCursor(10+len(hour), 1)
 
-		tm.MoveCursorForward(60)
+		tm.MoveCursorForward(40)
 		tm.MoveCursorDown(2)
 		tm.Println(tm.Bold("24 Hour"))
-		tm.MoveCursorForward(10)
+		tm.MoveCursorForward(5)
 		tm.Println(underline)
 
-		tm.MoveCursorForward(10)
+		tm.MoveCursorForward(5)
 		tm.Printf(tm.Bold("Exchange"))
 		tm.MoveCursorForward(10)
 		tm.Printf(tm.Bold("Average"))
@@ -159,7 +160,7 @@ func bitcoin_prices() {
 
 			tm.Println()
 
-			tm.MoveCursorForward(10)
+			tm.MoveCursorForward(5)
 			tm.Printf(day[i].Exchange)
 			// tm.MoveCursorDown(1)
 			tm.MoveCursorForward((18 - len(day[i].Exchange)))
