@@ -129,6 +129,9 @@ func bitcoin_prices() {
 			tm.Printf(hour[i].Date)
 		}
 
+		// Reset row
+		tm.MoveCursor(10+len(hour), 1)
+
 		tm.MoveCursorForward(60)
 		tm.MoveCursorDown(2)
 		tm.Println(tm.Bold("24 Hour"))
