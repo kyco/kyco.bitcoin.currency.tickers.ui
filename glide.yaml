@@ -1,0 +1,9 @@
+package: bitcoin-stats-ui
+import:
+- package: github.com/Beldur/kraken-go-api-client
+- package: github.com/fsnotify/fsnotify
+- package: github.com/op/go-logging
+- package: github.com/spf13/viper
+- package: github.com/mattn/go-sqlite3
+  version: ^1.2.0
+- package: github.com/buger/goterm
