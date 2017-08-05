@@ -18,9 +18,10 @@ var err error
 
 // Configure main config struct
 type Config struct {
-	Interval int
-	Log      string
-	SQLite   string
+	Interval           int
+	Log                string
+	SQLite             string
+	CurrencyCodeIgnore string
 }
 
 // Exchange data
@@ -201,8 +202,7 @@ func get_last_exchange_rates(hours string) []ExchangeData {
 				printf("%.2f", AVG((ask + bid) / 2)) as price,
 				AVG(volume) as volume, datetime(timestamp, 'unixepoch') as timestamp, currencyCode
 				from exchanges
-				where (currencyCode = "USD" or currencyCode = "btcusd" or currencyCode = "btc_usd")
-					and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + hours + ` Hour')
+				where currencyCode in ("USD", "ZAR") and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + hours + ` Hour')
 				group by exchange
 				order by volume desc;`)
 
@@ -281,11 +281,13 @@ func config_init() {
 		interval := viper.GetInt("interval")
 		logLocation := viper.GetString("log")
 		sqliteLocation := viper.GetString("sqliteLocation")
+		currencyCodeIgnore := viper.GetString("currencyCodeIgnore")
 		// Main Config
 		config = Config{
-			Interval: interval,
-			Log:      logLocation,
-			SQLite:   sqliteLocation,
+			Interval:           interval,
+			Log:                logLocation,
+			SQLite:             sqliteLocation,
+			CurrencyCodeIgnore: currencyCodeIgnore,
 		}
 	}
 

@@ -2,3 +2,4 @@
 interval = 1
 log = "/tmp/bitcoin-ui.log"
 sqliteLocation = ""
+currencyCodeIgnore = "ETH,"
