@@ -199,6 +199,7 @@ func get_last_exchange_rates(minutes string) []ExchangeData {
 
 	// Open SQLite
 	db := sqlite_open()
+	defer db.Close() // Don't forget to close
 	result, err := db.Query(`select exchange, printf("%.2f", AVG(ask)) as ask, printf("%.2f", AVG(bid)) as bid,
 				printf("%.2f", AVG((ask + bid) / 2)) as price,
 				AVG(volume) as volume, datetime(timestamp, 'unixepoch') as timestamp, currencyCode
@@ -206,6 +207,8 @@ func get_last_exchange_rates(minutes string) []ExchangeData {
 				where currencyCode in ("USD", "ZAR") and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + minutes + ` Minute')
 				group by exchange
 				order by volume desc;`)
+
+	defer result.Close() // Don't forget to close
 
 	if err != nil {
 		log.Error(err.Error())
