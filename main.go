@@ -2,12 +2,15 @@ package main
 
 import (
 	"database/sql"
-	// "fmt"
 	tm "github.com/buger/goterm"
 	"github.com/fsnotify/fsnotify"
+	ui "github.com/gizak/termui"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
+	"math"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"strings"
@@ -63,127 +66,19 @@ func bitcoin_prices() {
 
 	for {
 
-		tm.Clear() // Clear the screen
 		// wait for the tick
 		// <-t.C
 
-		// // Grab SQLite data
-		// 1 hourx
-		hour := get_last_exchange_rates("1")
-		day := get_last_exchange_rates("24")
+		var data []ExchangeData
 
-		begin := 3
+		// Grab SQLite data
+		data = get_last_exchange_rates("15")
 
-		// Underline
-		underline := strings.Repeat("-", 99)
+		// Pop graph in
+		// ui_create_graph(data)
 
-		// By moving cursor to top-left position we ensure that console output
-		// will be overwritten each time, instead of adding new.
-		tm.MoveCursor(begin, 20)
-
-		tm.Println("Current Time:", time.Now().Format(time.RFC1123))
-
-		tm.MoveCursor(begin+3, 40)
-		tm.Println(tm.Bold("1 Hour"))
-		tm.MoveCursorForward(5)
-		tm.Println(underline)
-
-		tm.MoveCursor(begin+5, 6)
-		tm.Printf(tm.Bold("Exchange"))
-		tm.MoveCursorForward(10)
-		tm.Printf(tm.Bold("Average"))
-		tm.MoveCursorForward(10)
-		tm.Printf(tm.Bold("Ask"))
-		tm.MoveCursorForward(13)
-		tm.Printf(tm.Bold("Buy"))
-		tm.MoveCursorForward(12)
-		tm.Printf(tm.Bold("Volume"))
-		tm.MoveCursorForward(8)
-		tm.Printf(tm.Bold("Time"))
-
-		// Reset to the beginning of the line
-		tm.MoveCursor(begin+6, 10)
-
-		// print hour based data
-		for i := range hour {
-
-			tm.Println()
-
-			tm.MoveCursorForward(5)
-			tm.Printf(hour[i].Exchange)
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((18 - len(hour[i].Exchange)))
-			tm.Printf(strconv.FormatFloat(hour[i].Price, 'f', 2, 64))
-			tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(hour[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((13 - len(strconv.FormatFloat(hour[i].Price, 'f', 2, 64))))
-			tm.Printf(strconv.FormatFloat(hour[i].Ask, 'f', 2, 64))
-			tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(hour[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((12 - len(strconv.FormatFloat(hour[i].Ask, 'f', 2, 64))))
-			tm.Printf(strconv.FormatFloat(hour[i].Bid, 'f', 2, 64))
-			tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(hour[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((11 - len(strconv.FormatFloat(hour[i].Bid, 'f', 2, 64))))
-			tm.Printf(strconv.FormatFloat(hour[i].Volume, 'f', 2, 64))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((14 - len(strconv.FormatFloat(hour[i].Volume, 'f', 2, 64))))
-			tm.Printf(hour[i].Date)
-		}
-
-		// Reset row
-		tm.MoveCursor(10+len(hour), 1)
-
-		tm.MoveCursorForward(40)
-		tm.MoveCursorDown(2)
-		tm.Println(tm.Bold("24 Hour"))
-		tm.MoveCursorForward(5)
-		tm.Println(underline)
-
-		tm.MoveCursorForward(5)
-		tm.Printf(tm.Bold("Exchange"))
-		tm.MoveCursorForward(10)
-		tm.Printf(tm.Bold("Average"))
-		tm.MoveCursorForward(10)
-		tm.Printf(tm.Bold("Ask"))
-		tm.MoveCursorForward(13)
-		tm.Printf(tm.Bold("Buy"))
-		tm.MoveCursorForward(12)
-		tm.Printf(tm.Bold("Volume"))
-		tm.MoveCursorForward(8)
-		tm.Printf(tm.Bold("Time"))
-
-		// Reset to the beginning of the line
-		tm.MoveCursorDown(1)
-
-		// print daily based data
-		for i := range day {
-
-			tm.Println()
-
-			tm.MoveCursorForward(5)
-			tm.Printf(day[i].Exchange)
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((18 - len(day[i].Exchange)))
-			tm.Printf(strconv.FormatFloat(day[i].Price, 'f', 2, 64))
-			tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(day[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((13 - len(strconv.FormatFloat(day[i].Price, 'f', 2, 64))))
-			tm.Printf(strconv.FormatFloat(day[i].Ask, 'f', 2, 64))
-			tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(day[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((12 - len(strconv.FormatFloat(day[i].Ask, 'f', 2, 64))))
-			tm.Printf(strconv.FormatFloat(day[i].Bid, 'f', 2, 64))
-			tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(day[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((11 - len(strconv.FormatFloat(day[i].Bid, 'f', 2, 64))))
-			tm.Printf(strconv.FormatFloat(day[i].Volume, 'f', 2, 64))
-			// tm.MoveCursorDown(1)
-			tm.MoveCursorForward((14 - len(strconv.FormatFloat(day[i].Volume, 'f', 2, 64))))
-			tm.Printf(day[i].Date)
-		}
-
-		tm.Flush() // Call it every time at the end of rendering
+		// Update UI
+		ui_top_table(data)
 
 		time.Sleep(20 * time.Second)
 
@@ -191,8 +86,114 @@ func bitcoin_prices() {
 
 }
 
+// manage the UI
+func ui_top_table(data []ExchangeData) {
+
+	tm.Clear() // Clear the screen
+
+	// Underline
+	underline := strings.Repeat("-", 99)
+
+	// By moving cursor to top-left position we ensure that console output
+	// will be overwritten each time, instead of adding new.
+	tm.MoveCursor(3, 20)
+
+	tm.Println("Current Time:", time.Now().Format(time.RFC1123))
+
+	tm.MoveCursor(6, 40)
+	tm.Println(tm.Bold("Current Exchange Rate"))
+	tm.MoveCursorForward(5)
+	tm.Println(underline)
+
+	tm.MoveCursor(8, 6)
+	tm.Printf(tm.Bold("Exchange"))
+	tm.MoveCursorForward(10)
+	tm.Printf(tm.Bold("Average"))
+	tm.MoveCursorForward(10)
+	tm.Printf(tm.Bold("Ask"))
+	tm.MoveCursorForward(13)
+	tm.Printf(tm.Bold("Buy"))
+	tm.MoveCursorForward(12)
+	tm.Printf(tm.Bold("Volume"))
+	tm.MoveCursorForward(8)
+	tm.Printf(tm.Bold("Time"))
+
+	// Reset to the beginning of the line
+	tm.MoveCursor(9, 10)
+
+	// print hour based data
+	for i := range data {
+
+		tm.Println()
+
+		tm.MoveCursorForward(5)
+		tm.Printf(data[i].Exchange)
+		// tm.MoveCursorDown(1)
+		tm.MoveCursorForward((18 - len(data[i].Exchange)))
+		tm.Printf(strconv.FormatFloat(data[i].Price, 'f', 2, 64))
+		tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(data[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
+		// tm.MoveCursorDown(1)
+		tm.MoveCursorForward((13 - len(strconv.FormatFloat(data[i].Price, 'f', 2, 64))))
+		tm.Printf(strconv.FormatFloat(data[i].Ask, 'f', 2, 64))
+		tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(data[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
+		// tm.MoveCursorDown(1)
+		tm.MoveCursorForward((12 - len(strconv.FormatFloat(data[i].Ask, 'f', 2, 64))))
+		tm.Printf(strconv.FormatFloat(data[i].Bid, 'f', 2, 64))
+		tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(data[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
+		// tm.MoveCursorDown(1)
+		tm.MoveCursorForward((11 - len(strconv.FormatFloat(data[i].Bid, 'f', 2, 64))))
+		tm.Printf(strconv.FormatFloat(data[i].Volume, 'f', 2, 64))
+		// tm.MoveCursorDown(1)
+		tm.MoveCursorForward((14 - len(strconv.FormatFloat(data[i].Volume, 'f', 2, 64))))
+		tm.Printf(data[i].Date)
+	}
+
+	tm.Flush() // Call it every time at the end of rendering
+}
+
+// Create a graph
+func ui_create_graph(data []ExchangeData) {
+	if err := ui.Init(); err != nil {
+		panic(err)
+	}
+	defer ui.Close()
+
+	sinps := (func() []float64 {
+		n := 220
+		ps := make([]float64, n)
+		for i := range ps {
+			ps[i] = 1 + math.Sin(float64(i)/5)
+		}
+		return ps
+	})()
+
+	lc := ui.NewLineChart()
+	lc.BorderLabel = "Bitcoin Price USD"
+	lc.Data = sinps
+	lc.Width = 100
+	lc.Height = 11
+	lc.X = 0
+	lc.Y = 20
+	lc.AxesColor = ui.ColorWhite
+	lc.LineColor = ui.ColorRed | ui.AttrBold
+	// lc.Mode = "dot"
+
+	draw := func(t int) {
+		lc.Data = sinps[t/2%220:]
+		ui.Render(lc)
+	}
+	ui.Handle("/sys/kbd/q", func(ui.Event) {
+		ui.StopLoop()
+	})
+	ui.Handle("/timer/1s", func(e ui.Event) {
+		t := e.Data.(ui.EvtTimer)
+		draw(int(t.Count))
+	})
+	ui.Loop()
+}
+
 // Grab sqlite data from database
-func get_last_exchange_rates(hours string) []ExchangeData {
+func get_last_exchange_rates(minutes string) []ExchangeData {
 
 	response := []ExchangeData{}
 
@@ -202,7 +203,7 @@ func get_last_exchange_rates(hours string) []ExchangeData {
 				printf("%.2f", AVG((ask + bid) / 2)) as price,
 				AVG(volume) as volume, datetime(timestamp, 'unixepoch') as timestamp, currencyCode
 				from exchanges
-				where currencyCode in ("USD", "ZAR") and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + hours + ` Hour')
+				where currencyCode in ("USD", "ZAR") and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + minutes + ` Minute')
 				group by exchange
 				order by volume desc;`)
 
@@ -321,5 +322,5 @@ func main() {
 	// Notify log that we are up and running
 	log.Info("started Bitcoin UI")
 
-	select {}
+	http.ListenAndServe(":8081", http.DefaultServeMux)
 }

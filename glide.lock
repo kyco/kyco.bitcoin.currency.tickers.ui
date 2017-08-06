@@ -1,5 +1,5 @@
-hash: 26df3496c9d805d9442dfe9b95b0e19afb0d2ab687b9a18f7310ca498483026b
-updated: 2017-08-04T19:34:21.32076562+02:00
+hash: 456baf2d02516b2e3936c43a80f75e63403063a73fde77aab5e7ffe0fa60315f
+updated: 2017-08-06T07:51:52.886661129+02:00
 imports:
 - name: github.com/Beldur/kraken-go-api-client
   version: f82698e146d5570c0ebc54cb979edc51827f7c52
@@ -7,6 +7,8 @@ imports:
   version: bc6c333206f446a53cac4db5d2e6a4316139d737
 - name: github.com/fsnotify/fsnotify
   version: 629574ca2a5df945712d3079857300b5e4da0236
+- name: github.com/gizak/termui
+  version: 24acd523c756fd9728824cdfac66aad9d8982fb7
 - name: github.com/hashicorp/hcl
   version: 392dba7d905ed5d04a5794ba89f558b27e2ba1ca
   subpackages:

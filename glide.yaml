@@ -7,3 +7,5 @@ import:
 - package: github.com/mattn/go-sqlite3
   version: ^1.2.0
 - package: github.com/buger/goterm
+- package: github.com/gizak/termui
+  version: ^2.2.0
