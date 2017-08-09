@@ -1,7 +1,7 @@
 # Currency Ticker UI
 This project is an extension of the [kyco.bitcoin.currency.tickers](https://github.com/kyco/kyco.bitcoin.currency.tickers.ui) project. This is a front end to display the currency ticker updates directly in your terminal.
 
-
+[!image](http://i.imgur.com/mWzrydt.png)
 
 ## How To Run?
 #### Dependencies
@@ -30,6 +30,8 @@ go build main.go
 
 ### How it works.
 The sqlite database created by the [kyco.bitcoin.currency.tickers](https://github.com/kyco/kyco.bitcoin.currency.tickers.ui) is queried every 20 seconds for the latest BTC conversion rates.
+
+[!image](http://i.imgur.com/mWzrydt.png)
 
 ### What Works
 Querying the sqlite database and displaying these in your terminal

@@ -21,10 +21,10 @@ var err error
 
 // Configure main config struct
 type Config struct {
-	Interval           int
-	Log                string
-	SQLite             string
-	CurrencyCodeIgnore string
+	Interval      int
+	Log           string
+	SQLite        string
+	CurrencyCodes string
 }
 
 // Exchange data
@@ -92,28 +92,28 @@ func ui_top_table(data []ExchangeData) {
 	tm.Clear() // Clear the screen
 
 	// Underline
-	underline := strings.Repeat("-", 99)
+	underline := strings.Repeat("-", 110)
 
 	// By moving cursor to top-left position we ensure that console output
 	// will be overwritten each time, instead of adding new.
-	tm.MoveCursor(3, 30)
+	tm.MoveCursor(3, 40)
 
 	tm.Println("Last Update:", time.Now().Format(time.RFC1123))
 
-	tm.MoveCursor(6, 40)
+	tm.MoveCursor(6, 50)
 	tm.Println(tm.Bold("Current Exchange Rate"))
 	tm.MoveCursorForward(5)
 	tm.Println(underline)
 
 	tm.MoveCursor(8, 6)
 	tm.Printf(tm.Bold("Exchange"))
-	tm.MoveCursorForward(10)
+	tm.MoveCursorForward(7)
 	tm.Printf(tm.Bold("Average"))
-	tm.MoveCursorForward(10)
+	tm.MoveCursorForward(14)
 	tm.Printf(tm.Bold("Ask"))
-	tm.MoveCursorForward(13)
-	tm.Printf(tm.Bold("Buy"))
-	tm.MoveCursorForward(12)
+	tm.MoveCursorForward(17)
+	tm.Printf(tm.Bold("Bid"))
+	tm.MoveCursorForward(18)
 	tm.Printf(tm.Bold("Volume"))
 	tm.MoveCursorForward(8)
 	tm.Printf(tm.Bold("Last Update"))
@@ -129,19 +129,19 @@ func ui_top_table(data []ExchangeData) {
 		tm.MoveCursorForward(5)
 		tm.Printf(data[i].Exchange)
 		// tm.MoveCursorDown(1)
-		tm.MoveCursorForward((18 - len(data[i].Exchange)))
+		tm.MoveCursorForward((15 - len(data[i].Exchange)))
 		tm.Printf(strconv.FormatFloat(data[i].Price, 'f', 2, 64))
 		tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(data[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
 		// tm.MoveCursorDown(1)
-		tm.MoveCursorForward((13 - len(strconv.FormatFloat(data[i].Price, 'f', 2, 64))))
+		tm.MoveCursorForward((17 - len(strconv.FormatFloat(data[i].Price, 'f', 2, 64))))
 		tm.Printf(strconv.FormatFloat(data[i].Ask, 'f', 2, 64))
 		tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(data[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
 		// tm.MoveCursorDown(1)
-		tm.MoveCursorForward((12 - len(strconv.FormatFloat(data[i].Ask, 'f', 2, 64))))
+		tm.MoveCursorForward((16 - len(strconv.FormatFloat(data[i].Ask, 'f', 2, 64))))
 		tm.Printf(strconv.FormatFloat(data[i].Bid, 'f', 2, 64))
 		tm.Printf(" " + strings.ToUpper(strings.Replace(strings.Replace(data[i].CurrencyCode, "btc", "", -1), "_", "", -1)))
 		// tm.MoveCursorDown(1)
-		tm.MoveCursorForward((11 - len(strconv.FormatFloat(data[i].Bid, 'f', 2, 64))))
+		tm.MoveCursorForward((17 - len(strconv.FormatFloat(data[i].Bid, 'f', 2, 64))))
 		tm.Printf(strconv.FormatFloat(data[i].Volume, 'f', 2, 64))
 		// tm.MoveCursorDown(1)
 		tm.MoveCursorForward((14 - len(strconv.FormatFloat(data[i].Volume, 'f', 2, 64))))
@@ -204,9 +204,9 @@ func get_last_exchange_rates(minutes string) []ExchangeData {
 				printf("%.2f", AVG((ask + bid) / 2)) as price,
 				AVG(volume) as volume, datetime(timestamp, 'unixepoch') as timestamp, currencyCode
 				from exchanges
-				where currencyCode in ("USD", "ZAR") and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + minutes + ` Minute')
-				group by exchange
-				order by volume desc;`)
+				where currencyCode in (` + config.CurrencyCodes + `) and datetime(timestamp, 'unixepoch') >= datetime('now', '-` + minutes + ` Minute')
+				group by exchange, currencyCode
+				order by currencyCode, volume desc;`)
 
 	defer result.Close() // Don't forget to close
 
@@ -285,13 +285,14 @@ func config_init() {
 		interval := viper.GetInt("interval")
 		logLocation := viper.GetString("log")
 		sqliteLocation := viper.GetString("sqliteLocation")
-		currencyCodeIgnore := viper.GetString("currencyCodeIgnore")
+		currencyCodes := viper.GetString("currencyCodes")
+
 		// Main Config
 		config = Config{
-			Interval:           interval,
-			Log:                logLocation,
-			SQLite:             sqliteLocation,
-			CurrencyCodeIgnore: currencyCodeIgnore,
+			Interval:      interval,
+			Log:           logLocation,
+			SQLite:        sqliteLocation,
+			CurrencyCodes: currencyCodes,
 		}
 	}
 
