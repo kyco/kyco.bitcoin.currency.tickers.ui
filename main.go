@@ -96,9 +96,9 @@ func ui_top_table(data []ExchangeData) {
 
 	// By moving cursor to top-left position we ensure that console output
 	// will be overwritten each time, instead of adding new.
-	tm.MoveCursor(3, 20)
+	tm.MoveCursor(3, 30)
 
-	tm.Println("Current Time:", time.Now().Format(time.RFC1123))
+	tm.Println("Last Update:", time.Now().Format(time.RFC1123))
 
 	tm.MoveCursor(6, 40)
 	tm.Println(tm.Bold("Current Exchange Rate"))
@@ -116,7 +116,7 @@ func ui_top_table(data []ExchangeData) {
 	tm.MoveCursorForward(12)
 	tm.Printf(tm.Bold("Volume"))
 	tm.MoveCursorForward(8)
-	tm.Printf(tm.Bold("Time"))
+	tm.Printf(tm.Bold("Last Update"))
 
 	// Reset to the beginning of the line
 	tm.MoveCursor(9, 10)
