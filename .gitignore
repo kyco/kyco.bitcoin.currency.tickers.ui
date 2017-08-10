@@ -9,3 +9,6 @@
 
 # Ignore all log files
 *.log
+
+# Ignore License
+!LICENSE
